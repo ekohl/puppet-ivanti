@@ -1,0 +1,90 @@
+{
+    "imports" : [
+        {
+            "filename" : "/opt/landesk/etc/landesk.conf",
+            "type" : "keyvalue"
+        }
+    ],
+
+    "taskTimeoutInSeconds" : 60,
+    "privilegeEscalationAllowed" : <%= @privilegeescalationallowed %>,
+    "brokerDirectory" : "/opt/landesk/var/cbaroot/broker",
+    "certDirectory" : "/opt/landesk/var/cbaroot/certs",
+
+    "logging" : {
+        "level" : "Info",
+        "streams" : [
+            {
+                "name" : "/opt/landesk/log/brokerconfig.log",
+                "maxSizeInMB" : 50,
+                "numberToKeep" : 3
+            }
+        ]
+    },
+
+    "commands" : [
+        {
+            "path" : "/opt/landesk/bin/makekey",
+            "timeoutInSeconds" : 10
+        },
+        {
+            "path" : "/opt/landesk/bin/proxyhost"
+        },
+        {
+            "path" : "/usr/bin/timeout --signal=KILL"
+        }
+    ],
+
+    "modules" : [
+        "libComms",
+        "libEngBrokerConfig",
+        "libScript"
+    ],
+
+    "options" : [
+        {
+            "short" : "l",
+            "long" : "logfile",
+            "description" : "Log filename",
+            "type" : "arg",
+            "argType" : "FILENAME"
+        },
+        {
+            "short" : "h",
+            "long" : "help",
+            "description" : "Displays help",
+            "type" : "noarg"
+        },
+        {
+            "short" : "c",
+            "long" : "config",
+            "description" : "Configuration file",
+            "type" : "arg",
+            "argType" : "FILENAME"
+        },
+        {
+            "long" : "console",
+            "description" : "Console fully qualified domain name or IP",
+            "type" : "arg",
+            "argType" : "FQDN/IP"
+        },
+        {
+            "short" : "v",
+            "long" : "version",
+            "description" : "Display application version and build date",
+            "type" : "noarg"
+        },
+        {
+            "short" : "V",
+            "long" : "verbose",
+            "description" : "Turn on debug level output.",
+            "type" : "noarg"
+        },
+        {
+            "short" : "f",
+            "long" : "forceRequest",
+            "description" : "Request new certificate from the core even if one already exists on the agent.",
+            "type" : "noarg"
+        }
+    ]
+}

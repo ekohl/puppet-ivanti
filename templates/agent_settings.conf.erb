@@ -1,0 +1,109 @@
+{
+    "imports" : [
+        {
+            "filename" : "/opt/landesk/etc/landesk.conf",
+            "type" : "keyvalue"
+        }
+    ],
+
+    "taskTimeoutInSeconds" : 3800,
+    "privilegeEscalationAllowed" : <%= @privilegeescalationallowed %>,
+    "jobDirectory" : "/opt/landesk/cache/jobs",
+
+    "logging" : {
+        "level" : "Info",
+        "streams" : [
+            {
+                "name" : "/opt/landesk/log/agentsettings.log",
+                "maxSizeInMB" : 50,
+                "numberToKeep" : 3
+            }
+        ]
+    },
+
+    "commands" : [
+        {
+            "path" : "/opt/landesk/bin/proxyhost"
+        },
+        {
+            "path" : "/usr/bin/timeout --signal=KILL"
+        }
+    ],
+
+    "modules" : [
+        "libEngAgentSettings",
+        "libComms",
+        "libAgentSettings"
+    ],
+
+    "options" : [
+        {
+            "short" : "l",
+            "long" : "logfile",
+            "description" : "Log filename",
+            "type" : "arg",
+            "argType" : "FILENAME"
+        },
+        {
+            "short" : "h",
+            "long" : "help",
+            "description" : "Displays help",
+            "type" : "noarg"
+        },
+        {
+            "short" : "c",
+            "long" : "config",
+            "description" : "Configuration file",
+            "type" : "arg",
+            "argType" : "FILENAME"
+        },
+        {
+            "long" : "console",
+            "description" : "Console fully qualified domain name or IP",
+            "type" : "arg",
+            "argType" : "FQDN/IP"
+        },
+        {
+            "short" : "v",
+            "long" : "version",
+            "description" : "Display application version and build date",
+            "type" : "noarg"
+        },
+        {
+            "short" : "V",
+            "long" : "verbose",
+            "description" : "Turn on debug level output.",
+            "type" : "noarg"
+        },
+        {
+            "long" : "taskId",
+            "description" : "Used to report to core.",
+            "type" : "arg",
+            "argType" : "TASKID"
+        },
+        {
+            "long" : "timeout",
+            "description" : "Number of seconds to use for max process run duration.",
+            "type" : "arg",
+            "argType" : "TIMEOUT"
+        },
+        {
+            "long" : "agentBehavior",
+            "description" : "Agent behavior to fetch.",
+            "type" : "arg",
+            "argType" : "BEHAVIOR"
+        },
+        {
+            "long" : "inventoryBehavior",
+            "description" : "Inventory behavior to fetch.",
+            "type" : "arg",
+            "argType" : "BEHAVIOR"
+        },
+        {
+            "long" : "clientConnectivityBehavior",
+            "description" : "Client Connectivity behavior to fetch.",
+            "type" : "arg",
+            "argType" : "BEHAVIOR"
+        }
+    ]
+}

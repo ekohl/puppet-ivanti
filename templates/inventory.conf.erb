@@ -1,0 +1,114 @@
+{
+    "imports" : [
+        {
+            "filename" : "/opt/landesk/etc/landesk.conf",
+            "type" : "keyvalue"
+        }
+    ],
+
+    "scanType" : "Full",
+    "taskTimeoutInSeconds" : 600,
+    "privilegeEscalationAllowed" : <%= @privilegeescalationallowed %>,
+    "consoleURL" : "/postingData/scan.upload?prefix=ldscan&suffix=.scn",
+
+    "customInventories" : [
+        {
+            "path" : "/opt/landesk/bin/docker_scan.py",
+            "timeoutInSeconds" : 5,
+            "privilegeEscalationRequired" : true
+        }
+    ],
+
+    "logging" : {
+        "level" : "Info",
+        "streams" : [
+            {
+                "name" : "/opt/landesk/log/inventory.log",
+                "maxSizeInMB" : 50,
+                "numberToKeep" : 3
+            }
+        ]
+    },
+
+    "commands" : [
+        {
+            "path" : "/usr/sbin/dmidecode",
+            "timeoutInSeconds" : 10,
+            "privilegeEscalationRequired" : true
+        },
+        {
+            "path" : "/usr/bin/localectl",
+            "timeoutInSeconds" : 5
+        },
+        {
+            "path" : "/usr/bin/timeout --signal=KILL"
+        },
+        {
+            "path" : "/opt/landesk/bin/proxyhost"
+        }
+    ],
+
+    "modules" : [
+        "libEngInventory",
+        "libInvAgentInformation",
+        "libInvCPU",
+        "libInvDrive",
+        "libInvEnvironment",
+        "libInvFileSystem",
+        "libInvMemory",
+        "libInvNetwork",
+        "libInvOS",
+        "libInvPackage",
+        "libInvSystem",
+        "libComms",
+        "libScript",
+        "libTlns"
+    ],
+
+    "options" : [
+        {
+            "short" : "l",
+            "long" : "logfile",
+            "description" : "Log filename",
+            "type" : "arg",
+            "argType" : "FILENAME"
+        },
+        {
+            "short" : "h",
+            "long" : "help",
+            "description" : "Displays help",
+            "type" : "noarg"
+        },
+        {
+            "short" : "c",
+            "long" : "config",
+            "description" : "Configuration file",
+            "type" : "arg",
+            "argType" : "FILENAME"
+        },
+        {
+            "long" : "console",
+            "description" : "Console's fully qualified domain name",
+            "type" : "arg",
+            "argType" : "FQDN/IP"
+        },
+        {
+            "short" : "o",
+            "long" : "output",
+            "description" : "Output results to specified file",
+            "argType" : "FILENAME"
+        },
+        {
+            "short" : "v",
+            "long" : "version",
+            "description" : "Display application version and build date",
+            "type" : "noarg"
+        },
+        {
+            "short" : "V",
+            "long" : "verbose",
+            "description" : "Turn on debug level output.",
+            "type" : "noarg"
+        }
+    ]
+}
