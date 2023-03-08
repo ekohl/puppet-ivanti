@@ -1,0 +1,46 @@
+--- 
+
+ivanti::packages:
+  - ivanti-base-agent
+  - ivanti-cba8
+  - ivanti-inventory
+  - ivanti-pds2
+  - ivanti-schedule
+  - ivanti-software-distribution
+  - ivanti-vulnerability
+
+# When a configuration file changes, we need to notify the EXEC resource
+# so that it can re-inventory, re-scan, etc.
+ivanti::config_files:
+  agent_settings:
+    notify:
+      - Exec[agent_settings]
+  broker_config:
+    notify:
+      - Exec[broker_config]
+  inventory:
+    notify:
+      - Exec[inventory]
+  policy:
+    notify:
+      - Exec[policy]
+      - Exec[map-fetchpolicy]
+  schedule:
+# Disable schedule notify for now because the schedule binary fails.
+#    notify:
+#      - Exec[schedule]
+  software_distribution:
+    notify:
+      - Exec[software_distribution]
+  vulnerability:
+    notify:
+      - Exec[vulnerability]
+      - Exec[vulscan]
+  hardware:
+    notify:
+      - Exec[inventory]
+  landesk:
+    mode: '0644'
+    notify:
+      - Exec[ldiscan]
+      - Exec[inventory]

@@ -1,0 +1,92 @@
+{
+    "imports" : [
+        {
+            "filename" : "/opt/landesk/etc/landesk.conf",
+            "type" : "keyvalue"
+        }
+    ],
+
+    "privilegeEscalationAllowed" : <%= @privilegeescalationallowed %>,
+    "taskTimeoutInSeconds" : 3900,
+
+    "logging" : {
+        "level" : "Info",
+        "streams" : [
+            {
+                "name" : "/opt/landesk/log/sched.log",
+                "maxSizeInMB" : 50,
+                "numberToKeep" : 3
+            }
+        ]
+    },
+
+    "commands" : [
+        {
+            "path" : "/usr/bin/timeout --signal=KILL"
+        }
+    ],
+
+    "modules" : [
+        "libEngSchedule"
+    ],
+
+    "options" : [
+        {
+            "short" : "l",
+            "long" : "logfile",
+            "description" : "Log filename",
+            "type" : "arg",
+            "argType" : "FILENAME"
+        },
+        {
+            "short" : "h",
+            "long" : "help",
+            "description" : "Displays help",
+            "type" : "noarg"
+        },
+        {
+            "short" : "c",
+            "long" : "config",
+            "description" : "Configuration file",
+            "type" : "arg",
+            "argType" : "FILENAME"
+        },
+        {
+            "short" : "o",
+            "long" : "output",
+            "description" : "Output results to specified file",
+            "argType" : "FILENAME"
+        },
+        {
+            "short" : "j",
+            "long" : "job",
+            "description" : "Job definition file",
+            "type" : "arg",
+            "argType" : "FILENAME"
+        },
+        {
+            "short" : "p",
+            "long" : "parse",
+            "description" : "Definition file is parseable into a valid job",
+            "type" : "noarg"
+        },
+        {
+            "short" : "t",
+            "long" : "time",
+            "description" : "Use this as the current time, format: 'YYYY/MM/DD-hh:mm'",
+            "argType" : "DATETIME"
+        },
+        {
+            "short" : "v",
+            "long" : "version",
+            "description" : "Display application version and build date",
+            "type" : "noarg"
+        },
+        {
+            "short" : "V",
+            "long" : "verbose",
+            "description" : "Turn on debug level output.",
+            "type" : "noarg"
+        }
+    ]
+}
