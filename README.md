@@ -225,3 +225,13 @@ sed -i 's/privilegeEscalationAllowed" : false/privilegeEscalationAllowed" : true
 systemctl start cba8
 for i in broker_config ldiscan vulscan map-fetchpolicy; do echo $i;  /opt/landesk/bin/${i} -V; done
 
+
+The package 'ivanti-cba8' also creates directories from the post install scripts:
+
+/opt/landesk/var/cbaroot/broker
+/opt/landesk/var/cbaroot/certs
+/opt/landesk/var/tmp
+/opt/landesk/scan_repository
+/opt/landesk/scan_repository/CSAStats
+
+this is no me gusto when it comes time for the binary files to 'do their thing'.

@@ -56,6 +56,8 @@ class ivanti (
     notify  => Service['cba8'],
   }
 
+  # Manage files in /opt/landesk/etc/.  Changes to any conf file will trigger the cba8 service restart
+  # and a cascade of exec resources.
   $config_files.each | $config_file, $config_file_attributes | {
     # Merge any settings from the hiera hash to create a default set of parameters.
     $attributes = deep_merge($config_file_defaults, $config_file_attributes)
@@ -70,6 +72,7 @@ class ivanti (
     ensure  => 'running',
     enable  => true,
     require => Package[$packages],
+    notify  => Exec['broker_config'],
   }
 
   # TODO firewall rules OR a firewall XML file.
@@ -77,21 +80,46 @@ class ivanti (
   # Execute the commands to register and then scan the agent.
   # The schedule exec is removed in the short term because the binary fails to return a zero return code.
   # $execs = ['agent_settings', 'broker_config', 'inventory', 'ldiscan', 'policy', 'schedule', 'software_distribution', 'vulnerability',]
-  $execs = ['agent_settings', 'broker_config', 'inventory', 'ldiscan', 'map-fetchpolicy', 'policy', 'software_distribution', 'vulscan', 'vulnerability',]
-  $execs.each | $exec | {
-    exec { $exec:
-      command     => "${install_dir}/bin/${exec} -V",
-      user        => 'root',
-      logoutput   => false,
-      refreshonly => true,
-      noop        => false,
-      require     => Service['cba8'],
-    }
+  # Since all of the execs are run in order, we only need to require Service[cba8] on the first exec in the list (agent_settings).
+  exec { 'agent_settings':
+    command     => "${install_dir}/bin/agent_settings -V",
+    user        => 'root',
+    logoutput   => true,
+    refreshonly => true,
+    require     => Service['cba8'],
+    notify      => Exec['broker_config'],
+  }
+  exec { 'broker_config':
+    command     => "${install_dir}/bin/broker_config -V",
+    user        => 'root',
+    logoutput   => true,
+    refreshonly => true,
+    notify      => Exec['ldiscan'],
+  }
+  exec { 'ldiscan':
+    command     => "${install_dir}/bin/ldiscan -V",
+    user        => 'root',
+    logoutput   => true,
+    refreshonly => true,
+    notify      => Exec['vulscan'],
+  }
+  exec { 'vulscan':
+    command     => "${install_dir}/bin/vulscan -V",
+    user        => 'root',
+    logoutput   => true,
+    refreshonly => true,
+    notify      => Exec['map-fetchpolicy'],
+  }
+  exec { 'map-fetchpolicy':
+    command     => "${install_dir}/bin/map-fetchpolicy -V",
+    user        => 'root',
+    logoutput   => true,
+    refreshonly => true,
   }
 
   # Ordering of a few execs is important
   # The ordering here was taken from the .sdtout.log file that is created when installing Ivanti
   # from the bash script.  I'm not sure if the ordering really matters but it makes sense that the broker_config
   # needs to run before ldiscan.  All other ordering is semi-arbitrary (ie, I made a best guess).
-  Exec['agent_settings'] -> Exec['broker_config'] -> Exec['ldiscan'] -> Exec['vulscan'] -> Exec['map-fetchpolicy']
+  Exec['agent_settings'] ~> Exec['broker_config'] ~> Exec['ldiscan'] ~> Exec['vulscan'] ~> Exec['map-fetchpolicy']
 }
