@@ -14,33 +14,29 @@ ivanti::packages:
 ivanti::config_files:
   agent_settings:
     notify:
-      - Exec[agent_settings]
+      - Service[cba8]
   broker_config:
     notify:
-      - Exec[broker_config]
+      - Service[cba8]
   inventory:
     notify:
-      - Exec[inventory]
+      - Service[cba8]
   policy:
     notify:
-      - Exec[policy]
-      - Exec[map-fetchpolicy]
+      - Service[cba8]
   schedule:
-# Disable schedule notify for now because the schedule binary fails.
-#    notify:
-#      - Exec[schedule]
+    notify:
+      - Service[cba8]
   software_distribution:
     notify:
-      - Exec[software_distribution]
+      - Service[cba8]
   vulnerability:
     notify:
-      - Exec[vulnerability]
-      - Exec[vulscan]
+      - Service[cba8]
   hardware:
     notify:
-      - Exec[inventory]
+      - Service[cba8]
   landesk:
     mode: '0644'
     notify:
-      - Exec[ldiscan]
-      - Exec[inventory]
+      - Service[cba8]
