@@ -60,6 +60,11 @@
 # @param install_dir
 # The directory in which the Ivanti agent will be installed.
 #
+# @param extra_dirs
+# An array of directories -- relative to the ${install_dir} path that the ivanti-cba8
+# package creates in the postinstall scriptlet of the RPM package.  These directories
+# are root owned and this screws stuff up unless they get changed back to landesk:landesk.
+#
 class ivanti (
   String $core_certificate,
   Stdlib::Fqdn $core_fqdn,
@@ -75,6 +80,7 @@ class ivanti (
   Boolean $privilegeescalationallowed     = true,
   Hash $config_files                      = $ivanti::config_files,
   Stdlib::Unixpath $install_dir           = '/opt/landesk',
+  Array[Stdlib::Unixpath] $extra_dirs     = $ivanti::extra_dirs,
 ) {
   # Install the Ivanti packages
   package { $packages:
@@ -96,6 +102,14 @@ class ivanti (
     mode    => '0644',
     source  => $external_url,
     require => Package[$packages],
+  }
+
+  # These directories get created by the ivanti-cba8 RPM as the root user and need to be changed
+  # back to landesk:landesk for some of the daemons to work properly.
+  $extra_dirs.each | $extra_dir | {
+    file {"${install_dir}/${extra_dir}":
+      owner => landesk,
+      group => landesk,
   }
 
   # 0644 is not the default mode for the conf files; 0640 is the default mode.  Unfortunately, the
@@ -133,7 +147,7 @@ class ivanti (
 
   # Execute the commands to register and then scan the agent.
   # The schedule exec is removed in the short term because the binary fails to return a zero return code.
-  # $execs = ['agent_settings', 'broker_config', 'inventory', 'ldiscan', 'policy', 'schedule', 'software_distribution', 'vulnerability',]
+  # $execs = ['agent_settings', 'broker_config', 'inventory', 'ldiscan', 'policy', 'schedule', 'software_distribution',]
   # Since all of the execs are run in order, we only need to require Service[cba8] on the first exec in the list (agent_settings).
   exec { 'agent_settings':
     command     => "${install_dir}/bin/agent_settings -V",
