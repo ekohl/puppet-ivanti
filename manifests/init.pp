@@ -1,26 +1,80 @@
-# @summary A short summary of the purpose of this class
+# @summary
+#   A Puppet module to install and configure Ivanti agent for Linux.
 #
-# A description of what this class does
-
-# @packages
-# The packages required to install Ivanti
+# When this class is declared with the default options, Puppet:
+# - Installs the appropriate Ivanti software packages for Linux.
+# - Places the required configuration files in a directory, with the [default location](#conf_dir) determined by your operating system.
+# - Downloads SSL certificates from (#
+# - Configures the server with a default virtual host and standard port (`80`) and address (`\*`) bindings.
+# - Creates a document root directory determined by your operating system, typically `/var/www`.
+# - Starts the Apache service.
 #
 # @example
-#   include ivanti
+#   class { 'ivanti': }
+#
+# @param core_certificate
+# This is the name of the certificate file that will be downloaded from the EM Core server.
+#
+# @param core_fqdn
+# This fully qualified domain name of the core server from which the @core_certificate 
+# will be downloaded and to which the Ivanti agent will register itself.
+#
+# @param device_id
+# A unique device ID (typically, the UUID of the server) used to register to the Core server.
+#
+# @param external_url
+# This is the full URI to the core certificate that will be downloaded and installed
+# to the agent.
+#
+# @param linux_baseclients
+# for future use:
+# This is the path to the tar bundle that contains the base clinet RPMs.
+# Typically, this isn't needed since this module will install the RPM packages
+# via a yum/dnf repository.
+#
+# @param packages
+# An array of packages to be installed on the agent.
+#
+# @param cba
+# Install the Ivanti base agent package.
+#
+# @param sd
+# Install the Ivanti software distribution package.
+#
+# @param vd
+# Install the Ivanti vulnerability package.
+#
+# @param manage_firewall
+# Manage the local firewall yes/no.
+#
+# @param firewall_ports
+# An array of firewall ports to be opened to allow communication to the Ivanti agent.
+#
+# @param privilegeescalationallowed
+# Allow sudo privilege excallation for the landesk user.  ${install_dir}/etc/*.conf
+# files will be updated.
+#
+# @param config_files
+# A hash of config files to be managed along with (optional) permissions, owner, etc.
+#
+# @param install_dir
+# The directory in which the Ivanti agent will be installed.
+#
 class ivanti (
   String $core_certificate,
-  Stdlib::Fqdn           $core_fqdn,
-  String $device_id = $facts['dmi']['product']['uuid'].downcase(),
-  Stdlib::Httpurl   $external_url                    = "http://${core_fqdn}/ldlogon/${core_certificate}",
-  Stdlib::Httpurl $linux_baseclients = "http://${core_fqdn}/ldlogon/unix/linux/baseclient64.tar.gz",  # Linux base client location for non-yum install
-  Optional[Variant[Array, String]] $packages = $ivanti::packages,
-  Optional[Boolean] $cba = true, # Standard LANDesk Agents
-  Optional[Boolean] $sd  = true, # Software Distribution
-  Optional[Boolean] $vd  = true, # Vulnerability Scanner
-  Optional[Variant[Array, Integer]] $firewall_ports = [9593, 9594, 9595],
-  Optional[Boolean] $privilegeescalationallowed = true,
-  Optional[Hash] $config_files = $ivanti::config_files,
-  Stdlib::Unixpath $install_dir     = '/opt/landesk',
+  Stdlib::Fqdn $core_fqdn,
+  String $device_id                       = $facts['dmi']['product']['uuid'].downcase(),
+  Stdlib::Httpurl   $external_url         = "http://${core_fqdn}/ldlogon/${core_certificate}",
+  Stdlib::Httpurl $linux_baseclients      = "http://${core_fqdn}/ldlogon/unix/linux/baseclient64.tar.gz",  # Linux base client location for non-yum install
+  Variant[Array, String] $packages        = $ivanti::packages,
+  Boolean $cba                            = true, # Install tandard LANDesk Agents
+  Boolean $sd                             = true, # Install Software Distribution
+  Boolean $vd                             = true, # Install Vulnerability Scanner
+  Boolean $manage_firewall                = false,
+  Variant[Array, Integer] $firewall_ports = [9593, 9594, 9595],
+  Boolean $privilegeescalationallowed     = true,
+  Hash $config_files                      = $ivanti::config_files,
+  Stdlib::Unixpath $install_dir           = '/opt/landesk',
 ) {
   # Install the Ivanti packages
   package { $packages:
