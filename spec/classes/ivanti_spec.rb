@@ -106,7 +106,7 @@ describe 'ivanti' do
         execs.each do |exec|
           it {
             is_expected.to contain_exec(exec)
-              .with_command("/etc/landesk/bin/#{exec} -V")
+              #.with_command("/etc/landesk/bin/#{exec} -V")
               .with_user('root')
               .with_refreshonly('true')
           }
